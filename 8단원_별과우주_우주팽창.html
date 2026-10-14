@@ -1,0 +1,1034 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>우주 팽창 탐구</title>
+<style>
+:root{
+  --bg:#f5f8ff; --card:#ffffff; --ink:#1d2340; --muted:#5a6285; --line:#e2e7f5;
+  --pri:#5b5bd6; --pri-ink:#3f3fb3; --pri-soft:#eceeff;
+  --ok:#15803d; --ok-soft:#e5f7ec; --bad:#be123c; --bad-soft:#ffe9ef;
+  --warm:#b45309; --warm-soft:#fff4dc; --sky-soft:#e6f6ff;
+  --space:#0b1230;
+}
+*{box-sizing:border-box}
+html{font-size:17px}
+html.present{font-size:21px}
+body{margin:0;background:var(--bg);color:var(--ink);line-height:1.65;
+  font-family:"Pretendard","Malgun Gothic","맑은 고딕","Apple SD Gothic Neo","Noto Sans KR",sans-serif;word-break:keep-all}
+button,input,select,textarea{font:inherit;color:inherit}
+header.top{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}
+.topbar{max-width:1120px;margin:0 auto;padding:10px 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.topbar h1{font-size:1.15rem;margin:0;white-space:nowrap}
+.topbar .unit{color:var(--muted);font-size:.85rem}
+.topbar .sp{flex:1}
+.chip{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:999px;background:var(--pri-soft);color:var(--pri-ink);font-weight:700;font-size:.85rem}
+.tbtn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 12px;cursor:pointer;font-size:.85rem;min-height:36px}
+.tbtn:hover{background:var(--pri-soft)}
+.tbtn.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+nav#nav{max-width:1120px;margin:0 auto;padding:0 16px 10px;display:flex;gap:6px;overflow-x:auto;scrollbar-width:thin}
+nav#nav button{flex:0 0 auto;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 12px;cursor:pointer;font-size:.82rem;color:var(--muted)}
+nav#nav button b{color:var(--pri);margin-right:4px}
+nav#nav button.on{background:var(--pri);color:#fff;border-color:var(--pri)}
+nav#nav button.on b{color:#fff}
+main{max-width:1120px;margin:0 auto;padding:20px 16px 110px}
+.step{display:none}
+.step.active{display:block;animation:fade .3s ease}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.tag{display:inline-block;font-size:.78rem;font-weight:800;letter-spacing:.05em;color:var(--pri);background:var(--pri-soft);padding:2px 10px;border-radius:999px}
+h2{font-size:1.6rem;margin:8px 0 4px}
+.lead{color:var(--muted);margin:0 0 18px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;box-shadow:0 2px 10px rgba(40,50,120,.05);margin-bottom:16px}
+.card h3{margin:0 0 10px;font-size:1.15rem}
+.grid2{display:grid;grid-template-columns:1fr;gap:16px}
+@media(min-width:880px){.grid2{grid-template-columns:1.35fr 1fr}.grid2.even{grid-template-columns:1fr 1fr}}
+.space{display:block;width:100%;border-radius:14px;background:var(--space);touch-action:none}
+.round{border-radius:50%}
+.cap{font-size:.85rem;color:var(--muted);margin-top:6px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:none;border-radius:12px;padding:11px 18px;font-weight:700;cursor:pointer;background:var(--pri);color:#fff;min-height:44px}
+.btn:hover{background:var(--pri-ink)}
+.btn.ghost{background:#fff;color:var(--pri-ink);border:1.5px solid var(--pri)}
+.btn.ghost:hover{background:var(--pri-soft)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.opts{display:grid;gap:10px}
+.opt{display:flex;align-items:center;gap:12px;text-align:left;border:2px solid var(--line);background:#fff;border-radius:14px;padding:12px 14px;cursor:pointer;min-height:48px}
+.opt:hover{border-color:#b9bdf3}
+.opt.sel{border-color:var(--pri);background:var(--pri-soft)}
+.opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.opt.wrong{border-color:var(--bad);background:var(--bad-soft)}
+.opt.sel::before{content:"●";color:var(--pri)}
+.opt.right::before{content:"✓";color:var(--ok);font-weight:900}
+.opt.wrong::before{content:"✗";color:var(--bad);font-weight:900}
+.fb{border-radius:12px;padding:12px 14px;margin-top:12px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-soft);color:#14532d}
+.fb.no{background:var(--bad-soft);color:#881337}
+.fb.info{background:var(--sky-soft);color:#0c4a6e}
+.note{background:var(--warm-soft);border-radius:14px;padding:14px 16px;color:#5c3a06}
+.key{background:var(--pri-soft);border-radius:14px;padding:16px 18px;margin-bottom:16px}
+.key h4{margin:0 0 6px;color:var(--pri-ink)}
+.key ul{margin:0;padding-left:20px}
+.locked{opacity:.55;filter:grayscale(.4)}
+textarea,input[type=text]{width:100%;border:1.5px solid var(--line);border-radius:12px;padding:10px 12px;background:#fff}
+textarea{min-height:84px;resize:vertical}
+textarea:focus,input:focus,select:focus{outline:3px solid #c9ccff;border-color:var(--pri)}
+label.f{display:block;font-weight:700;margin:12px 0 6px}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ctrl{margin-bottom:14px}
+.ctrl .lab{display:flex;justify-content:space-between;font-weight:700;font-size:.95rem}
+.ctrl .lab span{color:var(--muted);font-weight:500}
+input[type=range]{width:100%;accent-color:var(--pri);height:30px}
+input[type=range]:disabled{opacity:.4}
+.tog{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:10px;cursor:pointer;border:1px solid var(--line);margin-bottom:6px;background:#fff}
+.tog input{width:20px;height:20px;accent-color:var(--pri)}
+.mis{list-style:none;padding:0;margin:0}
+.mis li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed var(--line)}
+.mis li:last-child{border-bottom:0}
+.mis li .ck{flex:0 0 26px;height:26px;border-radius:50%;border:2px solid #c5cae6;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:.85rem;color:#fff}
+.mis li.done .ck{background:var(--ok);border-color:var(--ok)}
+.mis li.done{color:var(--ok)}
+.vid{display:flex;align-items:center;gap:12px;flex-wrap:wrap;background:#fff;border:2px dashed #f0b3c4;border-radius:14px;padding:10px 14px;margin-bottom:16px}
+.vid .ic{font-size:1.4rem}
+.vid b{color:#be185d}
+.vid a{color:var(--pri-ink);font-size:.85rem}
+.story{background:linear-gradient(135deg,#fff7fb,#f1f3ff);border-radius:16px;padding:16px 18px}
+table.cmpt{width:100%;border-collapse:collapse}
+.cmpt td,.cmpt th{border-bottom:1px solid var(--line);padding:8px 6px;text-align:left;vertical-align:top}
+.cmpt th{color:var(--muted);font-weight:600;font-size:.88rem}
+table.meas{width:100%;border-collapse:collapse;font-size:.95rem}
+table.meas th,table.meas td{border:1px solid var(--line);padding:6px 8px;text-align:center;vertical-align:middle}
+table.meas th{background:#f6f7ff;font-weight:700}
+table.meas input{width:100%;max-width:110px;border:1.5px solid var(--line);border-radius:8px;padding:6px 8px;text-align:center;background:#fff}
+table.meas td.diff{font-weight:800;color:var(--pri-ink)}
+table.meas td.big{background:var(--warm-soft)}
+table.meas.compact th,table.meas.compact td{padding:4px 6px}
+textarea.pasted{color:var(--bad);border-color:var(--bad);background:var(--bad-soft)}
+.tog.sm{padding:5px 9px;margin:0;font-size:.85rem;min-height:40px}
+.scopeBox{width:min(340px,calc(100vh - 470px),100%);min-width:220px;margin:0 auto}
+table.meas input{cursor:pointer}
+table.meas input:placeholder-shown{border-style:dashed;border-color:#b9bdf3;background:#f8f9ff}
+table.meas tr.on td{background:#fffbe6}
+@media(min-width:880px){.balloonCard{position:sticky;top:120px}}
+select{border:1.5px solid var(--line);border-radius:10px;padding:8px 10px;background:#fff;min-height:44px}
+.flash{perspective:1000px;cursor:pointer;margin:0 auto;max-width:560px}
+.flash .inner{position:relative;min-height:220px;transition:transform .5s;transform-style:preserve-3d}
+.flash.flip .inner{transform:rotateY(180deg)}
+.flash .face{position:absolute;inset:0;backface-visibility:hidden;border-radius:20px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;border:2px solid var(--line)}
+.flash .front{background:#fff}
+.flash .back{background:var(--pri-soft);transform:rotateY(180deg);border-color:#c9ccff}
+.flash .big{font-size:1.6rem;font-weight:800}
+.flash .small{font-size:1.1rem}
+.flash .hint{position:absolute;bottom:10px;font-size:.78rem;color:var(--muted)}
+.prog{height:10px;background:#e8ebf7;border-radius:99px;overflow:hidden}
+.prog i{display:block;height:100%;background:var(--pri);border-radius:99px;transition:width .3s}
+.qitem{border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px;background:#fff}
+.qitem .q{font-weight:700;margin-bottom:10px}
+.score{font-size:2.2rem;font-weight:900;color:var(--pri-ink)}
+pre.result{white-space:pre-wrap;background:#f8f9ff;border:1px solid var(--line);border-radius:14px;padding:14px;font-family:inherit;font-size:.92rem;max-height:360px;overflow:auto}
+.foot{position:fixed;left:0;right:0;bottom:0;background:rgba(255,255,255,.96);border-top:1px solid var(--line);z-index:15}
+.foot .in{max-width:1120px;margin:0 auto;padding:10px 16px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.foot .where{color:var(--muted);font-size:.85rem}
+.toast{position:fixed;left:50%;top:90px;transform:translateX(-50%) translateY(-20px);background:var(--ink);color:#fff;padding:10px 18px;border-radius:12px;opacity:0;transition:.3s;z-index:50;pointer-events:none;font-weight:700}
+.toast.show{opacity:1;transform:translateX(-50%)}
+details summary{cursor:pointer;font-weight:700;color:var(--pri-ink)}
+.deep{border:1.5px dashed #a5b4fc;border-radius:14px;padding:12px 16px;background:#fafaff}
+.deep .lbl{display:inline-block;font-size:.75rem;font-weight:800;color:#6d28d9;background:#f3e8ff;border-radius:999px;padding:1px 9px;margin-bottom:4px}
+.goal{display:flex;gap:10px;align-items:flex-start;margin:6px 0}
+.goal .n{flex:0 0 28px;height:28px;border-radius:50%;background:var(--pri);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800}
+.mini{font-size:.85rem;color:var(--muted)}
+.hide{display:none!important}
+.ox{display:grid;grid-template-columns:1fr auto;gap:10px;align-items:center;border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.ox .bt{display:flex;gap:6px}
+.ox .bt button{min-width:52px;min-height:44px;border-radius:10px;border:2px solid var(--line);background:#fff;font-weight:900;font-size:1.1rem;cursor:pointer}
+.ox .bt button.sel{border-color:var(--pri);background:var(--pri-soft)}
+.ox .bt button.right{border-color:var(--ok);background:var(--ok-soft);color:var(--ok)}
+.ox .bt button.wrong{border-color:var(--bad);background:var(--bad-soft);color:var(--bad)}
+.ox .ex{grid-column:1/-1;font-size:.9rem;display:none}
+.ox .ex.show{display:block}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:.85rem;color:var(--muted);margin-top:6px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.modal{position:fixed;inset:0;background:rgba(20,30,50,.45);display:none;align-items:center;justify-content:center;z-index:60;padding:16px}
+.modal.show{display:flex}
+.modal .box{background:#fff;border-radius:20px;max-width:440px;width:100%;padding:26px 22px;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.2);animation:fade .3s ease}
+.modal .box h3{font-size:1.5rem;margin:6px 0 8px}
+.modal .box .row{justify-content:center;margin-top:14px}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="topbar">
+    <h1>🎈 우주 팽창 탐구</h1>
+    <span class="unit">8. 별과 우주 · 6차시</span>
+    <span class="sp"></span>
+    <span class="chip" id="who">이름을 입력하세요</span>
+    <button class="tbtn" id="presentBtn" title="교실 TV·프로젝터용 큰 글씨">🖥️ 발표 모드</button>
+    <button class="tbtn" id="resetBtn">↺ 처음부터</button>
+  </div>
+  <nav id="nav"></nav>
+</header>
+
+<main>
+<!-- 0 시작 -->
+<section class="step" data-title="시작">
+  <span class="tag">시작</span>
+  <h2>오늘의 탐구: 우주는 지금도 커지고 있을까?</h2>
+  <p class="lead">약 100년 전, 천문학자들은 망원경에 보이는 흐릿한 덩어리 하나 때문에 고민하고 있었어요. 그 수수께끼를 풀다가 우주에 관한 놀라운 사실을 알게 되었지요.</p>
+  <div class="grid2 even">
+    <div class="card">
+      <h3>🎯 학습 목표</h3>
+      <div class="goal"><span class="n">1</span><div><b>외부 은하</b>가 무엇인지 말할 수 있다.</div></div>
+      <div class="goal"><span class="n">2</span><div><b>풍선 모형</b>을 이용하여 우주가 팽창하고 있음을 설명할 수 있다.</div></div>
+      <div class="note" style="margin-top:14px">💡 오늘의 큰 질문<br><b>"모든 은하가 우리은하에서 멀어진다면, 우리은하가 우주의 중심일까?"</b></div>
+    </div>
+    <div class="card">
+      <h3>✏️ 나의 정보</h3>
+      <label class="f" for="inNum">학번</label>
+      <input type="text" id="inNum" placeholder="예: 20512" inputmode="numeric" autocomplete="off">
+      <label class="f" for="inName">이름</label>
+      <input type="text" id="inName" placeholder="예: 김마산" autocomplete="off">
+      <p class="mini">입력한 내용은 마지막 단계에서 결과 카드로 만들어져요. 그 카드를 패들렛에 올리면 제출이 끝나요.</p>
+      <button class="btn" id="startBtn" style="margin-top:6px">탐구 시작하기 →</button>
+    </div>
+  </div>
+</section>
+
+<!-- 1 먼지 덩어리 수수께끼 -->
+<section class="step" data-title="먼지 덩어리 수수께끼">
+  <span class="tag">STEP 1 · 예측하고 확인하기</span>
+  <h2>밤하늘의 흐릿한 먼지 덩어리</h2>
+  <div class="vid"><span class="ic">📺</span><div>영상 <b>0:00 → 0:31</b> ("이것들은 사실…")에서 멈추고 예측해요.</div><a href="https://youtu.be/W_DDCyY6xyg?t=0" target="_blank" rel="noopener">영상 열기</a></div>
+  <p class="lead">1900년대 초, 망원경으로 하늘을 보면 별과 별 사이에 흐릿한 덩어리가 보였어요. 너무 흐려서 그 정체를 아무도 알 수 없었지요.</p>
+  <div class="grid2">
+    <div>
+      <div class="card" id="scopeCard" style="padding:14px">
+        <div class="ctrl" style="margin:0 0 8px"><div class="lab">🔭 망원경의 성능 <span id="scopeLab">작은 망원경</span></div>
+          <input type="range" id="scopeQ" min="0" max="100" value="0" disabled aria-label="망원경의 성능">
+          <p class="mini" style="margin:0" id="scopeLock">예측을 고르면 망원경을 쓸 수 있어요.</p></div>
+        <div class="scopeBox"><canvas id="cvScope" class="space round"></canvas></div>
+        <p class="cap" style="text-align:center" id="scopeCap">▲ 망원경으로 본 모습 (직접 그린 그림)</p>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h3>🔮 예측: 이 흐릿한 덩어리의 정체는 무엇일까요?</h3>
+        <div class="opts" id="blobOpts"></div>
+        <label class="f" for="blobWhy">그렇게 생각한 까닭</label>
+        <textarea id="blobWhy" placeholder="예: 지난 시간에 배운 ~처럼 보여서"></textarea>
+        <div class="fb" id="scopeFb"></div>
+      </div>
+    </div>
+  </div>
+  <div class="vid hide" id="vid1b"><span class="ic">📺</span><div>이제 영상 <b>0:31 → 0:55</b>를 보며 확인해요.</div></div>
+  <div class="key locked" id="key1">
+    <h4>🔒 핵심 정리 <span class="mini" id="key1Msg">(망원경 성능을 끝까지 올려 보세요)</span></h4>
+    <ul>
+      <li>허블은 우리은하에 속한다고 생각했던 <b>안드로메다은하</b>가 우리은하 밖에 있다는 것을 처음으로 밝혀내었어요.</li>
+      <li>우주에는 우리은하 외에도 수많은 다른 은하들이 있어요. 이것을 <b>외부 은하</b>라고 해요.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 2 은하들의 움직임 -->
+<section class="step" data-title="은하들의 움직임">
+  <span class="tag">STEP 2 · 예측하기</span>
+  <h2>외부 은하들은 어떻게 움직이고 있을까?</h2>
+  <div class="vid"><span class="ic">📺</span><div>영상 <b>1:41 → 2:36</b> ("하지만…")에서 멈추고 예측해요.</div><a href="https://youtu.be/W_DDCyY6xyg?t=101" target="_blank" rel="noopener">1:41부터 열기</a></div>
+  <p class="lead">허블은 망원경으로 수많은 외부 은하를 관측했어요. 외부 은하들은 우리은하에 대해 어떻게 움직이고 있었을까요?</p>
+  <div class="grid2">
+    <div>
+      <canvas id="cvMove" class="space"></canvas>
+      <p class="cap" id="moveCap">▲ 우리은하와 주변의 외부 은하들 (직접 그린 그림)</p>
+    </div>
+    <div>
+      <div class="card">
+        <h3>🔮 예측 ①: 외부 은하들은…</h3>
+        <div class="opts" id="moveOpts"></div>
+        <button class="btn" id="moveShow" style="margin-top:12px" disabled>허블의 관측 결과 보기 ▶</button>
+        <div class="fb" id="moveFb"></div>
+      </div>
+      <div class="deep">
+        <span class="lbl">더 알아보기 (심화)</span>
+        <details><summary>허블은 은하가 멀어지는 것을 어떻게 알았을까?</summary>
+          <p class="mini" style="margin:8px 0 0">자동차가 지나갈 때 소리의 높낮이가 바뀌는 것처럼, 빛도 빛을 내는 물체가 움직이면 색이 조금 달라져 보여요. 다가오는 물체의 빛은 푸른 쪽으로, 멀어지는 물체의 빛은 붉은 쪽으로 치우쳐요. 허블이 관측한 외부 은하들의 빛은 대부분 붉은 쪽으로 치우쳐 있었어요. (영상 1:41~2:36의 내용으로, 교과서 밖의 내용이에요.)</p>
+        </details>
+      </div>
+    </div>
+  </div>
+  <div class="card hide" id="centerCard">
+    <div class="vid" style="margin-bottom:12px"><span class="ic">📺</span><div>영상 <b>2:36 → 2:46</b> ("모든 방향으로!")에서 멈춰요.</div></div>
+    <h3>🔮 예측 ②: 대부분의 외부 은하가 우리은하에서 멀어진다면, 우리은하가 우주의 중심일까요?</h3>
+    <div class="opts" id="centerOpts" style="grid-template-columns:repeat(auto-fit,minmax(200px,1fr))"></div>
+    <label class="f" for="centerWhy">그렇게 생각한 까닭</label>
+    <textarea id="centerWhy" placeholder="예: 모든 은하가 우리에게서 멀어지니까 ~"></textarea>
+    <div class="note" style="margin-top:12px">🎈 이 질문의 답은 다음 단계의 <b>풍선 실험</b>에서 직접 찾아봐요!</div>
+  </div>
+</section>
+
+<!-- 3 풍선 실험 -->
+<section class="step" data-title="풍선 실험 기록">
+  <span class="tag">STEP 3 · 실험하기 (2인 1조)</span>
+  <h2>풍선 팽창으로 우주 팽창 설명하기</h2>
+  <p class="lead">준비물: 고무풍선, 붙임딱지 4개, 펌프, 줄자, 펜 · 실제 풍선이 없으면 <b>아래 가상 풍선</b>으로 실험할 수 있어요.</p>
+  <div class="card">
+    <h3>🧪 실험 방법</h3>
+    <ol style="margin:0;padding-left:20px">
+      <li>고무풍선에 펌프로 바람을 <b>약간</b> 넣고, 붙임딱지 4개를 붙여 ①, ②, ③, ④를 쓴다.</li>
+      <li>줄자를 풍선 표면에 대고 딱지 사이의 거리를 잰다. <span class="mini">(딱지의 가운데에서 가운데까지)</span></li>
+      <li>펌프로 고무풍선을 <b>더 크게</b> 만든 뒤, 같은 거리를 다시 잰다.</li>
+    </ol>
+    <p class="mini" style="margin-bottom:0">🎈 <b>가상 풍선</b>: 표의 빈칸을 누르면 풍선 위에 그 두 딱지 사이의 거리가 표시되고, 잰 값이 빈칸에 들어가요. 실제 풍선으로 실험했다면 빈칸에 직접 숫자를 써도 돼요.</p>
+  </div>
+  <div class="grid2 even">
+    <div>
+      <div class="card balloonCard">
+        <div class="row" style="justify-content:space-between;margin-bottom:6px">
+          <h3 style="margin:0">🎈 가상 풍선</h3>
+          <div class="row" style="gap:6px">
+            <button class="tbtn" id="bSmall">처음 크기</button>
+            <button class="tbtn" id="bBig">크게 불기</button>
+          </div>
+        </div>
+        <svg id="balloon" viewBox="0 0 400 400" style="width:100%;max-width:420px;display:block;margin:0 auto" role="img" aria-label="붙임딱지 4개가 붙은 고무풍선"></svg>
+        <p class="cap" style="text-align:center" id="balloonCap">표의 빈칸을 누르면 여기에서 거리를 재요.</p>
+      </div>
+    </div>
+    <div>
+      <div class="card">
+        <h3>📏 측정 ① — 딱지 ①에서 잰 거리 (cm)</h3>
+        <table class="meas" id="tbl1"></table>
+        <div class="fb" id="fb1"></div>
+      </div>
+      <div class="card">
+        <h3>📏 측정 ② — 딱지 ②에서 잰 거리 (cm)</h3>
+        <table class="meas" id="tbl2"></table>
+        <div class="fb" id="fb2"></div>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>🔎 정리하기</h3>
+    <div class="qitem"><div class="q">Q1. 고무풍선이 커지면서 붙임딱지 사이의 거리는 어떻게 변하나요?</div><div class="opts" id="eq0"></div><div class="fb" id="ef0"></div></div>
+    <div class="qitem"><div class="q">Q2. 측정 ①에서 처음에 ①과 <u>멀리</u> 있던 딱지는 가까이 있던 딱지보다…</div><div class="opts" id="eq1"></div><div class="fb" id="ef1"></div></div>
+    <div class="qitem"><div class="q">Q3. 딱지 ①에서 봐도, 딱지 ②에서 봐도 다른 딱지들은 모두 멀어졌나요? 이것은 무엇을 뜻할까요?</div><div class="opts" id="eq2"></div><div class="fb" id="ef2"></div></div>
+    <div class="qitem"><div class="q">Q4. 풍선 표면의 팽창을 우주 팽창에 비유할 때, 풍선의 표면과 붙임딱지는 각각 무엇에 해당할까요?</div>
+      <div class="row"><label>풍선의 표면 → <select id="selSurf"><option value="">고르세요</option></select></label>
+      <label>붙임딱지 → <select id="selStk"><option value="">고르세요</option></select></label>
+      <button class="btn ghost" id="mapCheck">확인</button></div>
+      <div class="fb" id="mapFb"></div></div>
+  </div>
+</section>
+
+<!-- 4 팽창 시뮬레이션 -->
+<section class="step" data-title="팽창 시뮬레이션">
+  <span class="tag">STEP 4 · 조작하고 관찰하기</span>
+  <h2>어느 은하에서 보아도 똑같을까?</h2>
+  <p class="lead">풍선 표면을 넓게 펼친 그림이에요. <b>기준 은하</b>(내가 서 있는 은하)를 바꿔 가며 팽창시켜 보세요.</p>
+  <div class="grid2">
+    <div>
+      <canvas id="cvExp" class="space" style="cursor:pointer"></canvas>
+      <p class="cap" id="expCap" style="margin-bottom:4px"></p>
+      <div class="row" style="gap:6px">
+        <label class="tog sm"><input type="checkbox" id="tGhost" checked> ◯ 처음 위치</label>
+        <label class="tog sm"><input type="checkbox" id="tArrow" checked> → 움직인 거리</label>
+        <label class="tog sm"><input type="checkbox" id="tLine" checked> 📏 거리 재기 선</label>
+      </div>
+      <p class="mini" style="margin:4px 0 0">⊙ 노란 테두리: 기준 은하 · 흐린 동그라미: 처음 위치 · 화살표: 움직인 거리</p>
+    </div>
+    <div>
+      <div class="card" style="padding:14px 16px;margin-bottom:12px">
+        <div class="ctrl" style="margin-bottom:8px"><div class="lab">우주의 크기 <span id="aLab">처음의 1.00배</span></div>
+          <input type="range" id="aR" min="100" max="200" value="100" aria-label="우주의 크기"></div>
+        <div class="row" style="margin-bottom:10px">
+          <button class="btn" id="playBtn">▶ 팽창시키기</button>
+          <button class="btn ghost" id="backBtn">↺ 처음 크기로</button>
+        </div>
+        <div class="row" style="gap:6px">
+          <span class="mini" style="font-weight:700">기준 은하:</span>
+          <button class="tbtn" data-ref="0">★ 우리은하</button>
+          <button class="tbtn" data-ref="1">가</button>
+          <button class="tbtn" data-ref="2">나</button>
+          <button class="tbtn" data-ref="3">다</button>
+        </div>
+        <h3 style="margin:12px 0 6px;font-size:1.05rem">📏 기준 은하에서 잰 거리 <span class="mini" style="font-weight:500">(단위: 눈금)</span></h3>
+        <table class="meas compact" id="expTbl"></table>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <h3>🧭 탐구 미션</h3>
+    <ul class="mis" id="missions"></ul>
+    <div class="qitem" style="margin-top:12px"><div class="q">Q1. 기준 은하에서 처음에 멀리 있던 은하일수록…</div><div class="opts" id="sq0"></div><div class="fb" id="sf0"></div></div>
+    <div class="qitem"><div class="q">Q2. 기준 은하를 바꿔 보니 어떤가요? 우주 팽창의 중심은 어디일까요?</div><div class="opts" id="sq1"></div><div class="fb" id="sf1"></div></div>
+  </div>
+  <div class="key locked" id="key4">
+    <h4>🔒 핵심 정리 <span class="mini" id="key4Msg">(미션을 모두 해결하면 열려요)</span></h4>
+    <ul>
+      <li>풍선의 표면이 늘어나면서 붙임딱지가 서로 멀어지는 것처럼, 은하들도 <b>우주가 팽창함에 따라 서로 멀어진다</b>.</li>
+      <li>어느 은하에서 보아도 다른 은하들이 멀어진다. 우주 공간은 <b>특별한 중심 없이 모든 방향으로 팽창</b>하고 있다.</li>
+      <li>과학자들은 우주가 <b>모든 물질과 에너지가 모인 한 점에서 시작하여 계속 팽창</b>하고 있다고 설명한다.</li>
+    </ul>
+    <div class="deep" style="margin-top:10px"><span class="lbl">더 알아보기 (심화)</span>
+      <p class="mini" style="margin:2px 0 0">한 점은 우주 속의 어느 한 곳이 아니에요. 우주 전체가 아주 작고 뜨거웠던 상태를 말해요. 그래서 그 점이 지금 우주의 중심인 것은 아니에요.</p></div>
+  </div>
+</section>
+
+<!-- 5 모형 따져 보기 -->
+<section class="step" data-title="모형 따져 보기">
+  <span class="tag">STEP 5 · 연결하기</span>
+  <h2>풍선 모형은 우주와 얼마나 닮았을까?</h2>
+  <p class="lead">모형은 실제를 쉽게 이해하도록 돕지만, 실제와 똑같지는 않아요. 아래 설명이 맞으면 O, 틀리면 X를 눌러 보세요.</p>
+  <div class="card" id="oxBox"></div>
+  <div class="card">
+    <h3>🍞 다른 모형으로도 설명할 수 있을까?</h3>
+    <div class="grid2 even">
+      <svg viewBox="0 0 360 170" style="width:100%;display:block" role="img" aria-label="건포도빵이 부풀어 오르면서 건포도 사이의 간격이 멀어지는 그림">
+        <ellipse cx="80" cy="95" rx="62" ry="40" fill="#f4c27a" stroke="#b7791f" stroke-width="2"/>
+        <g fill="#6b2f1a"><circle cx="58" cy="88" r="5"/><circle cx="88" cy="80" r="5"/><circle cx="100" cy="104" r="5"/><circle cx="70" cy="110" r="5"/></g>
+        <text x="80" y="160" text-anchor="middle" font-size="13" font-weight="700" fill="#5a6285">굽기 전</text>
+        <path d="M152 95 h36" stroke="#5b5bd6" stroke-width="3" marker-end="url(#ah2)"/>
+        <defs><marker id="ah2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0L10,5L0,10z" fill="#5b5bd6"/></marker></defs>
+        <ellipse cx="275" cy="90" rx="80" ry="58" fill="#f0b45f" stroke="#b7791f" stroke-width="2"/>
+        <g fill="#6b2f1a"><circle cx="240" cy="78" r="5"/><circle cx="285" cy="62" r="5"/><circle cx="305" cy="110" r="5"/><circle cx="255" cy="122" r="5"/></g>
+        <text x="275" y="164" text-anchor="middle" font-size="13" font-weight="700" fill="#5a6285">구운 뒤</text>
+      </svg>
+      <div>
+        <p style="margin-top:0">건포도빵을 구우면 빵이 부풀어 오르면서 건포도 사이의 간격이 멀어져요.</p>
+        <label class="f" style="margin-top:0">빵 → <select id="selBread"><option value="">고르세요</option></select></label>
+        <label class="f">건포도 → <select id="selRaisin"><option value="">고르세요</option></select></label>
+        <button class="btn ghost" id="breadCheck">확인</button>
+        <div class="fb" id="breadFb"></div>
+      </div>
+    </div>
+    <label class="f" for="myModel">✨ 과학 창의성: 우주 팽창에 비유할 수 있는 모형을 주변에서 하나 더 찾아보세요.</label>
+    <textarea id="myModel" placeholder="예: ~이 늘어나면서 ~ 사이의 간격이 멀어지는 것"></textarea>
+  </div>
+</section>
+
+<!-- 6 용어 카드 -->
+<section class="step" data-title="용어 카드">
+  <span class="tag">STEP 6 · 꼭 기억하기</span>
+  <h2>꼭 기억할 용어</h2>
+  <p class="lead">카드를 눌러 뒤집어 보세요. 확실히 아는 카드는 <b>'알아요'</b>, 헷갈리는 카드는 <b>'다시 볼래요'</b>를 눌러요.</p>
+  <div class="card">
+    <div class="row" style="justify-content:space-between;margin-bottom:12px">
+      <div class="row">
+        <button class="tbtn on" id="fmTerm">용어 → 뜻</button>
+        <button class="tbtn" id="fmDef">뜻 → 용어</button>
+        <label class="row mini" style="gap:6px"><input type="checkbox" id="fOnlyUnknown"> 아직 모르는 카드만</label>
+      </div>
+      <span class="mini" id="fCount"></span>
+    </div>
+    <div class="prog" style="margin-bottom:14px"><i id="fBar" style="width:0"></i></div>
+    <div class="flash" id="flash"><div class="inner"><div class="face front"><div class="big" id="fFront"></div><span class="hint">눌러서 뒤집기</span></div><div class="face back"><div class="small" id="fBack"></div><span class="hint">눌러서 뒤집기</span></div></div></div>
+    <div class="row" style="justify-content:center;margin-top:14px">
+      <button class="btn ghost" id="fPrev">← 이전</button>
+      <button class="btn ghost" id="fAgain">🔁 다시 볼래요</button>
+      <button class="btn" id="fKnow">✓ 알아요</button>
+    </div>
+  </div>
+  <div class="card"><details><summary>📋 용어 한눈에 보기 (외우기용 목록)</summary><table class="cmpt" id="termTable" style="margin-top:10px"></table></details></div>
+</section>
+
+<!-- 7 확인 퀴즈 -->
+<section class="step" data-title="확인 퀴즈">
+  <span class="tag">STEP 7 · 확인하기</span>
+  <h2>확인 퀴즈</h2>
+  <p class="lead">처음 고른 답으로 점수가 매겨져요. 틀린 문제는 해설을 꼭 읽어 보세요.</p>
+  <div id="quizBox"></div>
+  <div class="card row" style="justify-content:space-between"><div>점수 <span class="score" id="quizScore">0</span> / 10</div><button class="btn ghost" id="quizRetry">다시 풀기</button></div>
+</section>
+
+<!-- 8 성찰·제출 -->
+<section class="step" data-title="성찰·제출">
+  <span class="tag">STEP 8 · 성찰하고 제출하기</span>
+  <h2>오늘의 배움 돌아보기</h2>
+  <div class="vid"><span class="ic">📺</span><div>영상 <b>4:04 → 4:55</b>를 보고 1번 질문에 답해요.</div><a href="https://youtu.be/W_DDCyY6xyg?t=244" target="_blank" rel="noopener">4:04부터 열기</a></div>
+  <div class="card">
+    <h3>🔁 처음 예측과 지금 비교하기</h3>
+    <table class="cmpt" id="predTable"></table>
+  </div>
+  <div class="card">
+    <h3>💭 성찰 질문</h3>
+    <label class="f" for="r1" style="margin-top:0">1. 아주 먼 미래의 사람들이 밤하늘을 본다면 어떤 모습일까요? 왜 그렇게 될지 '우주 팽창'을 넣어 설명해 보세요.</label>
+    <textarea id="r1" placeholder="예: 우주가 계속 팽창하면 은하들이 ~"></textarea>
+    <label class="f" for="r2">2. "우리은하가 우주의 중심일까?"에 대한 내 생각은 수업 전과 후에 어떻게 달라졌나요?</label>
+    <textarea id="r2" placeholder="예: 처음에는 ~라고 생각했는데, 풍선 실험에서 ~"></textarea>
+    <label class="f">3. 오늘 수업에서 새롭게 궁금해진 것을 하나 쓰고, 그 답을 직접 찾아 써 보세요.</label>
+    <div class="deep" style="border-style:solid">
+      <label class="f" for="r3" style="margin-top:0">❓ 궁금해진 것</label>
+      <textarea id="r3" placeholder="예: 우주는 얼마나 빠르게 팽창하고 있을까?"></textarea>
+      <label class="f" for="r3a">🔍 내가 찾은 답 <span class="mini" style="font-weight:500">(내 말로 설명하기)</span></label>
+      <textarea id="r3a" placeholder="AI나 누리집에서 찾은 내용을 내 말로 바꿔서 설명해요."></textarea>
+      <div class="fb" id="r3aFb"></div>
+      <label class="f" for="r3s">📚 답을 찾은 곳</label>
+      <input type="text" id="r3s" placeholder="예: AI(챗봇 이름), 한국천문연구원 누리집, 교과서 ○쪽">
+      <p class="mini" style="margin:6px 0 0">💡 AI로 찾아도 좋아요. 다만 AI도 틀릴 수 있으니 교과서나 한국천문연구원, 국립과천과학관, NASA 같은 기관 누리집에서 한 번 더 확인해 보세요.<br>✏️ 찾은 글을 그대로 붙여넣으면 <b style="color:var(--bad)">빨간색</b>으로 표시돼요. 내 말로 바꿔 쓰면 원래 색으로 돌아와요.</p>
+    </div>
+  </div>
+  <div class="card">
+    <h3>📮 결과 카드 만들기 → 패들렛에 제출</h3>
+    <ol style="margin-top:0">
+      <li><b>텍스트 복사</b>를 누른 뒤 패들렛 게시물에 붙여넣거나,</li>
+      <li><b>이미지 저장</b>을 누른 뒤 저장된 그림을 패들렛에 올려요.</li>
+    </ol>
+    <div class="row" style="margin-bottom:12px">
+      <button class="btn" id="copyBtn">📋 텍스트 복사</button>
+      <button class="btn ghost" id="pngBtn">🖼️ 이미지 저장</button>
+    </div>
+    <pre class="result" id="resultText"></pre>
+  </div>
+</section>
+</main>
+
+<div class="foot"><div class="in">
+  <button class="btn ghost" id="prevBtn">← 이전</button>
+  <span class="where" id="where"></span>
+  <button class="btn" id="nextBtn">다음 →</button>
+</div></div>
+<div class="modal" id="doneModal" role="dialog" aria-modal="true" aria-labelledby="doneTitle"><div class="box">
+  <div style="font-size:3rem">🎉</div>
+  <h3 id="doneTitle">탐구 완료!</h3>
+  <p id="doneMsg" style="margin:0"></p>
+  <div class="row"><button class="btn" id="doneCopy">📋 텍스트 복사</button><button class="btn ghost" id="donePng">🖼️ 이미지 저장</button></div>
+  <p class="mini" style="margin:12px 0 0">복사하거나 저장한 결과 카드를 패들렛에 올리면 제출이 끝나요.</p>
+  <button class="tbtn" id="doneClose" style="margin-top:14px">닫기</button>
+</div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+/* ===== 기본 도구 ===== */
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function rng(seed){return function(){seed|=0;seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gauss(r){let u=0;while(!u)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fit(cv,aspect){
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  const W=Math.max(200,cv.clientWidth||cv.parentNode.clientWidth||600);
+  const H=Math.round(W*aspect);
+  cv.style.height=H+'px';
+  if(cv.width!==Math.round(W*dpr)||cv.height!==Math.round(H*dpr)){cv.width=Math.round(W*dpr);cv.height=Math.round(H*dpr);}
+  const ctx=cv.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);
+  ctx.globalCompositeOperation='source-over';ctx.globalAlpha=1;
+  return {ctx,W,H};
+}
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>t.classList.remove('show'),2200);}
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+function glowDot(ctx,x,y,rad,col,a){if(rad<=0)return;const g=ctx.createRadialGradient(x,y,0,x,y,rad);g.addColorStop(0,`rgba(${col},${a})`);g.addColorStop(1,`rgba(${col},0)`);ctx.fillStyle=g;ctx.beginPath();ctx.arc(x,y,rad,0,7);ctx.fill();}
+function tagLabel(ctx,x,y,text,opt={}){
+  ctx.save();ctx.globalCompositeOperation='source-over';
+  ctx.font=`700 ${opt.size||13}px "Malgun Gothic","Apple SD Gothic Neo",sans-serif`;
+  const w=ctx.measureText(text).width+14,h=(opt.size||13)+10;
+  ctx.fillStyle=opt.bg||'rgba(255,255,255,0.93)';
+  ctx.beginPath();if(ctx.roundRect)ctx.roundRect(x-w/2,y-h/2,w,h,7);else ctx.rect(x-w/2,y-h/2,w,h);ctx.fill();
+  ctx.fillStyle=opt.color||'#1d2340';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(text,x,y+1);
+  ctx.restore();
+}
+function arrow(ctx,x1,y1,x2,y2,col,w){
+  const L=Math.hypot(x2-x1,y2-y1);if(L<3)return;
+  const ux=(x2-x1)/L,uy=(y2-y1)/L,h=Math.min(9,L*0.6);
+  ctx.strokeStyle=col;ctx.fillStyle=col;ctx.lineWidth=w;
+  ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2-ux*h*0.8,y2-uy*h*0.8);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x2,y2);ctx.lineTo(x2-ux*h-uy*h*0.55,y2-uy*h+ux*h*0.55);ctx.lineTo(x2-ux*h+uy*h*0.55,y2-uy*h-ux*h*0.55);ctx.closePath();ctx.fill();
+}
+
+/* ===== 상태 저장 ===== */
+const KEY='sim_8_6_expansion_v1';
+const DEFAULT={step:0,num:'',name:'',
+  pred:{blob:null,blobWhy:'',move:null,center:null,centerWhy:''},
+  scope:{max:0},moveShown:false,
+  exp:{t1:{b:['','',''],a:['','','']},t2:{b:['','',''],a:['','','']},q:{},surf:'',stk:'',mapOk:false},
+  sim:{m1:false,m2:false,refs:[0],q:{}},
+  ox:{},bread:{b:'',r:'',ok:false},myModel:'',
+  flash:{known:[]},quiz:{first:{}},ref:{r1:'',r2:'',r3:'',r3a:'',r3s:'',r3paste:[]},present:false};
+let S=JSON.parse(JSON.stringify(DEFAULT));
+function merge(a,b){for(const k in b){if(b[k]&&typeof b[k]==='object'&&!Array.isArray(b[k])&&a[k]&&typeof a[k]==='object'&&!Array.isArray(a[k]))merge(a[k],b[k]);else a[k]=b[k];}return a;}
+try{const raw=localStorage.getItem(KEY);if(raw)merge(S,JSON.parse(raw));}catch(e){}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(S));}catch(e){}}
+
+/* ===== 단계 이동 ===== */
+const STEPS=$$('.step');
+const nav=$('#nav');
+STEPS.forEach((s,i)=>{const b=document.createElement('button');b.innerHTML=(i?`<b>${i}</b>`:'')+s.dataset.title;b.onclick=()=>go(i);nav.appendChild(b);});
+function go(i){
+  i=Math.max(0,Math.min(STEPS.length-1,i));S.step=i;save();
+  STEPS.forEach((s,k)=>s.classList.toggle('active',k===i));
+  $$('#nav button').forEach((b,k)=>b.classList.toggle('on',k===i));
+  const nb=$$('#nav button')[i];if(nb&&nb.scrollIntoView)nb.scrollIntoView({block:'nearest',inline:'center'});
+  $('#prevBtn').disabled=i===0;
+  $('#nextBtn').textContent=i===STEPS.length-1?'완료':'다음 →';
+  $('#where').textContent=`${i+1} / ${STEPS.length} · ${STEPS[i].dataset.title}`;
+  window.scrollTo({top:0});
+  stopAnim();
+  requestAnimationFrame(()=>enter(i));
+}
+$('#prevBtn').onclick=()=>go(S.step-1);
+$('#nextBtn').onclick=()=>{if(S.step===STEPS.length-1)finish();else go(S.step+1);};
+function enter(i){
+  if(i===1)drawScope();
+  if(i===2)drawMove();
+  if(i===3)renderExp();
+  if(i===4){drawExp();renderSim();}
+  if(i===5)renderOx();
+  if(i===6)renderFlash();
+  if(i===7)renderQuiz();
+  if(i===8)renderResult();
+}
+let rT;window.addEventListener('resize',()=>{clearTimeout(rT);rT=setTimeout(()=>enter(S.step),150);});
+
+/* ===== 상단: 이름·발표 모드·초기화 ===== */
+function updateWho(){$('#who').textContent=(S.num||S.name)?`${S.num} ${S.name}`.trim():'이름을 입력하세요';}
+$('#inNum').value=S.num;$('#inName').value=S.name;
+$('#inNum').oninput=e=>{S.num=e.target.value.trim();save();updateWho();};
+$('#inName').oninput=e=>{S.name=e.target.value.trim();save();updateWho();};
+$('#startBtn').onclick=()=>{if(!S.num||!S.name){toast('학번과 이름을 입력해 주세요');return;}go(1);};
+function applyPresent(){document.documentElement.classList.toggle('present',S.present);$('#presentBtn').classList.toggle('on',S.present);}
+$('#presentBtn').onclick=()=>{S.present=!S.present;save();applyPresent();setTimeout(()=>enter(S.step),50);};
+$('#resetBtn').onclick=()=>{if(confirm('입력한 내용이 모두 지워지고 처음부터 시작해요. 계속할까요?')){try{localStorage.removeItem(KEY);}catch(e){}location.reload();}};
+
+/* ===== 선택지 도우미 ===== */
+function makeOpts(box,items,getSel,onPick,opt={}){
+  box.innerHTML='';
+  items.forEach((it,i)=>{
+    const b=document.createElement('button');b.className='opt';b.type='button';
+    b.innerHTML=`<span>${it}</span>`;
+    b.onclick=()=>{onPick(i);paint();};box.appendChild(b);
+  });
+  function paint(){const s=getSel();[...box.children].forEach((b,i)=>{b.classList.remove('sel','right','wrong');if(opt.correct!==undefined&&s!==null&&s!==undefined){if(i===opt.correct)b.classList.add('right');else if(i===s)b.classList.add('wrong');}else if(i===s)b.classList.add('sel');});}
+  paint();return paint;
+}
+/* 정답이 있는 질문: 한 번 고르면 정답·해설 표시 (다시 고를 수 있음) */
+function checkQ(box,fbBox,q,store,key,after){
+  const pick=()=>store[key];
+  function show(){const v=pick();const f=fbBox;if(v===undefined||v===null){f.className='fb';return;}
+    f.className='fb show '+(v===q.a?'ok':'no');f.innerHTML=(v===q.a?'✓ 맞아요! ':'✗ 다시 생각해 봐요. ')+q.ex;}
+  const paint=makeOpts(box,q.o,()=>{const v=pick();return v===undefined?null:v;},i=>{store[key]=i;save();show();if(after)after();},{});
+  // 정답 여부 색 표시
+  const repaint=()=>{const v=pick();[...box.children].forEach((b,i)=>{b.classList.remove('sel','right','wrong');if(v===i)b.classList.add(v===q.a?'right':'wrong');});};
+  [...box.children].forEach(b=>b.addEventListener('click',()=>setTimeout(repaint,0)));
+  repaint();show();
+}
+
+/* ===== STEP 1 먼지 덩어리 ===== */
+const BLOB_OPTS=['아직 별이 되지 않은 가스와 먼지 구름(성운)','우리은하 밖에 있는 또 다른 은하','지구 대기에 떠 있는 구름','꼬리가 아직 생기지 않은 혜성'];
+makeOpts($('#blobOpts'),BLOB_OPTS,()=>S.pred.blob,i=>{S.pred.blob=i;save();unlockScope();});
+$('#blobWhy').value=S.pred.blobWhy;$('#blobWhy').oninput=e=>{S.pred.blobWhy=e.target.value;save();};
+let GALIMG=null;
+function buildGal(){
+  const c=document.createElement('canvas');c.width=c.height=360;const x=c.getContext('2d');
+  x.translate(180,180);x.rotate(-0.6);x.scale(1,0.42);x.globalCompositeOperation='lighter';
+  const r=rng(7);
+  glowDot(x,0,0,150,'200,190,255',0.18);
+  glowDot(x,0,0,70,'255,225,180',0.55);
+  glowDot(x,0,0,26,'255,245,220',0.95);
+  for(let i=0;i<4200;i++){
+    const arm=i%2?Math.PI:0;const t=r()*3.2;const rad=18+t*46;
+    const ang=arm+t*1.35+gauss(r)*0.22;const px=Math.cos(ang)*rad+gauss(r)*6,py=Math.sin(ang)*rad+gauss(r)*6;
+    const blue=r()<0.55;x.fillStyle=blue?`rgba(170,200,255,${0.25+r()*0.5})`:`rgba(255,220,180,${0.2+r()*0.45})`;
+    const s=r()<0.04?2.2:1.2;x.fillRect(px,py,s,s);
+  }
+  for(let i=0;i<900;i++){const rad=Math.abs(gauss(r))*40;const a=r()*7;x.fillStyle=`rgba(255,230,190,${0.3+r()*0.4})`;x.fillRect(Math.cos(a)*rad,Math.sin(a)*rad,1.2,1.2);}
+  x.globalCompositeOperation='source-over';x.strokeStyle='rgba(30,20,40,0.35)';x.lineWidth=3;
+  x.beginPath();for(let t=0.3;t<2.6;t+=0.05){const rad=18+t*46,ang=t*1.35+0.35;x.lineTo(Math.cos(ang)*rad,Math.sin(ang)*rad);}x.stroke();
+  GALIMG=c;
+}
+const SCOPE_STARS=(()=>{const r=rng(3),a=[];for(let i=0;i<140;i++)a.push([r(),r(),r()]);return a;})();
+function drawScope(){
+  if(!GALIMG)buildGal();
+  const cv=$('#cvScope');const {ctx,W,H}=fit(cv,1);
+  ctx.fillStyle='#070b20';ctx.fillRect(0,0,W,H);
+  const q=S.scope.cur!==undefined?S.scope.cur:0;
+  const s=Math.round(4+Math.pow(q/100,3.2)*356);
+  const sm=document.createElement('canvas');sm.width=sm.height=s;const sx=sm.getContext('2d');
+  sx.imageSmoothingEnabled=true;sx.drawImage(GALIMG,0,0,s,s);
+  ctx.imageSmoothingEnabled=true;ctx.globalCompositeOperation='lighter';
+  // 흐리게 볼수록 빛이 퍼져 어두워지므로 여러 번 겹쳐 그려 밝기를 맞춘다
+  const gw=W*0.82,pass=1+Math.round(Math.pow(1-q/100,1.5)*4);
+  for(let k=0;k<pass;k++)ctx.drawImage(sm,(W-gw)/2,(H-gw)/2,gw,gw);
+  SCOPE_STARS.forEach(([a,b,c])=>{const x=a*W,y=b*H;const rad=c<0.08?2.2:1.1;ctx.fillStyle=`rgba(255,255,255,${0.4+c*0.6})`;ctx.beginPath();ctx.arc(x,y,rad,0,7);ctx.fill();if(c<0.08)glowDot(ctx,x,y,7,'220,230,255',0.5);});
+  ctx.globalCompositeOperation='source-over';
+  $('#scopeLab').textContent=q<30?'작은 망원경':q<75?'더 큰 망원경':'세계에서 가장 큰 망원경';
+  $('#scopeCap').textContent=q<95?'▲ 망원경으로 본 모습 (직접 그린 그림) · 별 사이에 흐릿한 덩어리가 보여요':'▲ 흐릿한 덩어리 속에 수많은 별이 소용돌이 모양으로 모여 있어요! (직접 그린 그림)';
+}
+function unlockScope(){
+  const on=S.pred.blob!==null;$('#scopeQ').disabled=!on;$('#scopeLock').textContent=on?'막대를 오른쪽으로 끝까지 밀어 보세요.':'예측을 고르면 망원경을 쓸 수 있어요.';
+}
+$('#scopeQ').oninput=e=>{S.scope.cur=+e.target.value;S.scope.max=Math.max(S.scope.max,S.scope.cur);save();drawScope();updateScopeFb();};
+function updateScopeFb(){
+  const done=S.scope.max>=95;const f=$('#scopeFb');
+  if(done){f.className='fb show '+(S.pred.blob===1?'ok':'info');
+    f.innerHTML=(S.pred.blob===1?'✓ 예측이 맞았어요! ':'🔎 예측과 비교해 보세요. ')+'흐릿한 덩어리는 먼지 구름이 아니라 <b>수많은 별이 모인 또 다른 은하</b>였어요. 너무 멀리 있어서 작은 망원경으로는 흐릿하게만 보였던 거예요.';}
+  else f.className='fb';
+  $('#key1').classList.toggle('locked',!done);$('#key1').querySelector('h4').firstChild.textContent=done?'🔓 핵심 정리 ':'🔒 핵심 정리 ';
+  $('#key1Msg').textContent=done?'':'(망원경 성능을 끝까지 올려 보세요)';
+  $('#vid1b').classList.toggle('hide',!done);
+}
+$('#scopeQ').value=S.scope.cur||0;unlockScope();updateScopeFb();
+
+/* ===== 은하 그리기 (STEP 2, 4 공용) ===== */
+const NAMED=[{x:0,y:0,n:'★ 우리은하'},{x:0.16,y:-0.12,n:'가'},{x:-0.24,y:0.32,n:'나'},{x:0.48,y:0.36,n:'다'}];
+const GALS=(()=>{const r=rng(2024),a=NAMED.map((g,i)=>({x:g.x,y:g.y,name:g.n,id:i,kind:i===0?0:(i%2),rot:r()*3,tilt:0.45+r()*0.5,size:i===0?1.25:1,hue:i}));
+  let tries=0;while(a.length<120&&tries<5000){tries++;const g={x:(r()*2-1)*2.6,y:(r()*2-1)*1.7};
+    if(a.some(b=>Math.hypot(b.x-g.x,b.y-g.y)<0.13))continue;
+    a.push({x:g.x,y:g.y,name:'',id:a.length,kind:r()<0.6?1:2,rot:r()*3,tilt:0.35+r()*0.6,size:0.6+r()*0.6,hue:Math.floor(r()*4)});}
+  return a;})();
+const GCOL=['255,224,150','200,215,255','255,215,200','225,205,255'];
+function drawGalaxy(ctx,x,y,g,px){
+  const R=px*g.size;
+  ctx.save();ctx.translate(x,y);ctx.rotate(g.rot);ctx.scale(1,g.tilt);ctx.globalCompositeOperation='lighter';
+  const col=g.id===0?'255,220,120':GCOL[g.hue%4];
+  glowDot(ctx,0,0,R*1.5,col,0.35);
+  if(g.kind!==2){ctx.strokeStyle=`rgba(${col},0.75)`;ctx.lineWidth=Math.max(1,R*0.22);
+    for(let k=0;k<2;k++){ctx.beginPath();for(let t=0;t<2.4;t+=0.15){const rr=R*0.18+t*R*0.42,an=k*Math.PI+t*1.5;ctx.lineTo(Math.cos(an)*rr,Math.sin(an)*rr);}ctx.stroke();}}
+  glowDot(ctx,0,0,R*0.55,'255,250,235',0.95);
+  ctx.restore();
+}
+const BGSTARS=(()=>{const r=rng(77),a=[];for(let i=0;i<220;i++)a.push([r(),r(),r()]);return a;})();
+function spaceBg(ctx,W,H){ctx.fillStyle='#0b1230';ctx.fillRect(0,0,W,H);BGSTARS.forEach(([a,b,c])=>{ctx.fillStyle=`rgba(255,255,255,${0.12+c*0.3})`;ctx.fillRect(a*W,b*H,1,1);});}
+/* 화면 좌표: 기준 은하가 가운데, 거리는 (처음 거리)×(우주 크기) */
+function view(W,H,half){const S0=W/2/half;return (g,ref,a)=>[W/2+(g.x-ref.x)*a*S0,H/2+(g.y-ref.y)*a*S0];}
+
+/* ===== STEP 2 은하들의 움직임 ===== */
+const MOVE_OPTS=['우리은하 쪽으로 다가오고 있다','우리은하에서 멀어지고 있다','제자리에 가만히 있다','방향 없이 제멋대로 움직인다'];
+makeOpts($('#moveOpts'),MOVE_OPTS,()=>S.pred.move,i=>{S.pred.move=i;save();$('#moveShow').disabled=false;});
+$('#moveShow').disabled=S.pred.move===null;
+let anim=null;
+function stopAnim(){if(anim){cancelAnimationFrame(anim);anim=null;}playing=false;if($('#playBtn'))$('#playBtn').textContent='▶ 팽창시키기';}
+let moveA=1;
+function drawMove(){
+  const cv=$('#cvMove');const {ctx,W,H}=fit(cv,0.62);spaceBg(ctx,W,H);
+  const P=view(W,H,1.15);const ref=GALS[0];const px=Math.max(5,W/90);
+  if(moveA>1.001){GALS.forEach(g=>{if(g.id===0)return;const [x0,y0]=P(g,ref,1),[x1,y1]=P(g,ref,moveA);if(x0<-20||x0>W+20||y0<-20||y0>H+20)return;
+    ctx.strokeStyle='rgba(255,255,255,0.25)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(x0,y0,px*0.5,0,7);ctx.stroke();arrow(ctx,x0,y0,x1,y1,'rgba(255,200,120,0.85)',1.6);});}
+  GALS.forEach(g=>{const [x,y]=P(g,ref,moveA);if(x<-30||x>W+30||y<-30||y>H+30)return;drawGalaxy(ctx,x,y,g,px);});
+  const [cx,cy]=P(ref,ref,moveA);tagLabel(ctx,cx,cy+px*2.6,'★ 우리은하',{size:13});
+}
+$('#moveShow').onclick=()=>{
+  stopAnim();moveA=1;const t0=performance.now();
+  const stepF=t=>{moveA=1+Math.min(1,(t-t0)/2500)*0.55;drawMove();if(moveA<1.55)anim=requestAnimationFrame(stepF);else{anim=null;S.moveShown=true;save();updateMoveFb();}};
+  anim=requestAnimationFrame(stepF);
+};
+function updateMoveFb(){
+  const f=$('#moveFb');
+  if(S.moveShown){f.className='fb show '+(S.pred.move===1?'ok':'info');
+    f.innerHTML=(S.pred.move===1?'✓ 예측이 맞았어요! ':'🔎 예측과 비교해 보세요. ')+'허블은 외부 은하를 관측한 결과, <b>대부분의 외부 은하들이 서로 멀어지고 있다</b>는 것을 알아내었어요.';
+    $('#moveCap').textContent='▲ 화살표: 외부 은하들이 움직인 방향과 거리';}
+  else f.className='fb';
+  $('#centerCard').classList.toggle('hide',!S.moveShown);
+}
+const CENTER_OPTS=['그렇다, 우리은하가 중심이다','아니다, 중심이 아니다','잘 모르겠다'];
+makeOpts($('#centerOpts'),CENTER_OPTS,()=>S.pred.center,i=>{S.pred.center=i;save();});
+$('#centerWhy').value=S.pred.centerWhy;$('#centerWhy').oninput=e=>{S.pred.centerWhy=e.target.value;save();};
+updateMoveFb();
+if(S.moveShown)moveA=1.55;
+
+/* ===== STEP 3 풍선 실험 기록 ===== */
+const PAIRS={t1:['①–②','①–③','①–④'],t2:['②–①','②–③','②–④']};
+function num(v){const n=parseFloat(String(v).replace(',','.'));return isNaN(n)?null:n;}
+function renderTable(t){
+  const tb=$('#tbl'+(t==='t1'?1:2));const D=S.exp[t];
+  tb.innerHTML='<tr><th>딱지 사이</th><th>처음</th><th>크게 분 뒤</th><th>늘어난 거리</th></tr>'+PAIRS[t].map((p,i)=>
+    `<tr id="r_${t}_${i}"><td><b>${p}</b></td><td><input type="text" inputmode="decimal" data-t="${t}" data-k="b" data-i="${i}" value="${esc(D.b[i])}" placeholder="눌러서 재기" aria-label="${p} 처음 거리"></td><td><input type="text" inputmode="decimal" data-t="${t}" data-k="a" data-i="${i}" value="${esc(D.a[i])}" placeholder="눌러서 재기" aria-label="${p} 크게 분 뒤 거리"></td><td class="diff" id="d_${t}_${i}"></td></tr>`).join('');
+  tb.querySelectorAll('input').forEach(inp=>{
+    inp.oninput=e=>{const d=e.target.dataset;S.exp[d.t][d.k][+d.i]=e.target.value.trim();save();updateDiff(d.t);};
+    inp.addEventListener('pointerdown',()=>measure(inp));
+    inp.addEventListener('focus',()=>measure(inp));
+  });
+  updateDiff(t);
+}
+/* ----- 가상 풍선: 딱지 위치(cm, 처음 크기 기준). ①에서 4, 7, 10 cm ----- */
+const STK=[[0,0],[3.2,-2.4],[-4.2,5.6],[8,6]];
+const BC=[1.9,1.8],BR=9,BIG=1.5,PXCM=11.5;
+const PIDX={t1:[[0,1],[0,2],[0,3]],t2:[[1,0],[1,2],[1,3]]};
+const r1=v=>Math.round(v*10)/10;
+function stkDist(i,j,big){const d=r1(Math.hypot(STK[i][0]-STK[j][0],STK[i][1]-STK[j][1]));return big?r1(d*BIG):d;}
+let bS=1,bTarget=1,bPair=null,bAnim=null;
+function drawBalloon(){
+  const svg=$('#balloon');if(!svg)return;
+  const cx=200,cy=178,k=PXCM*bS,R=BR*k;
+  const pos=STK.map(([x,y])=>[cx+(x-BC[0])*k,cy+(y-BC[1])*k]);
+  let h=`<defs><radialGradient id="bl" cx="36%" cy="30%" r="75%"><stop offset="0" stop-color="#ffe4ec"/><stop offset="1" stop-color="#f58fae"/></radialGradient></defs>`;
+  h+=`<ellipse cx="${cx}" cy="${cy}" rx="${R}" ry="${R*1.06}" fill="url(#bl)" stroke="#d9668a" stroke-width="2"/>`;
+  const by=cy+R*1.06;h+=`<path d="M${cx} ${by} l-7 12 h14 z" fill="#d9668a"/><path d="M${cx} ${by+12} q-8 14 4 26" stroke="#9a5b6f" stroke-width="1.5" fill="none"/>`;
+  if(bPair){const [i,j]=bPair,[x1,y1]=pos[i],[x2,y2]=pos[j];
+    h+=`<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#1d4ed8" stroke-width="3" stroke-dasharray="7 5" stroke-linecap="round"/>`;
+    const big=bS>1.25;const d=stkDist(i,j,big);const mx=(x1+x2)/2,my=(y1+y2)/2;
+    h+=`<rect x="${mx-34}" y="${my-14}" width="68" height="26" rx="8" fill="#fff" stroke="#1d4ed8" stroke-width="1.5"/><text x="${mx}" y="${my+5}" text-anchor="middle" font-size="15" font-weight="800" fill="#1d4ed8">${Math.abs(bS-bTarget)<0.01?d.toFixed(1)+' cm':'…'}</text>`;}
+  pos.forEach(([x,y],i)=>{const on=bPair&&bPair.includes(i);
+    h+=`<rect x="${x-13}" y="${y-10}" width="26" height="20" rx="3" fill="${on?'#fde047':'#fff59d'}" stroke="${on?'#1d4ed8':'#a16207'}" stroke-width="${on?2.5:1.5}"/><text x="${x}" y="${y+6}" text-anchor="middle" font-size="15" font-weight="800" fill="#1d2340">${'①②③④'[i]}</text>`;});
+  h+=`<text x="12" y="24" font-size="14" font-weight="800" fill="#5a6285">${bS>1.25?'크게 분 뒤':'처음 크기'}</text>`;
+  svg.innerHTML=h;
+  $('#bSmall').classList.toggle('on',bTarget===1);$('#bBig').classList.toggle('on',bTarget===BIG);
+}
+function setBalloon(target,done){
+  bTarget=target;if(bAnim)cancelAnimationFrame(bAnim);
+  const from=bS,t0=performance.now();
+  const f=t=>{const u=Math.min(1,(t-t0)/600);bS=from+(target-from)*(1-Math.pow(1-u,3));drawBalloon();if(u<1)bAnim=requestAnimationFrame(f);else{bAnim=null;bS=target;drawBalloon();if(done)done();}};
+  if(Math.abs(from-target)<0.001){bS=target;drawBalloon();if(done)done();}else bAnim=requestAnimationFrame(f);
+}
+function measure(inp){
+  const d=inp.dataset,i=+d.i,big=d.k==='a',pair=PIDX[d.t][i];
+  bPair=pair;$$('table.meas tr').forEach(r=>r.classList.remove('on'));const row=$(`#r_${d.t}_${i}`);if(row)row.classList.add('on');
+  const lab=PAIRS[d.t][i],v=stkDist(pair[0],pair[1],big);
+  $('#balloonCap').innerHTML=`<b>${lab}</b> 사이의 거리 (${big?'크게 분 뒤':'처음'}): <b>${v.toFixed(1)} cm</b>`;
+  if(!inp.value.trim()){inp.value=v.toFixed(1);S.exp[d.t][d.k][i]=inp.value;save();updateDiff(d.t);}
+  setBalloon(big?BIG:1);
+}
+$('#bSmall').onclick=()=>setBalloon(1);$('#bBig').onclick=()=>setBalloon(BIG);
+function tableStat(t){const D=S.exp[t];const b=D.b.map(num),a=D.a.map(num);const full=b.every(v=>v!==null)&&a.every(v=>v!==null);
+  const d=b.map((v,i)=>v!==null&&a[i]!==null?Math.round((a[i]-v)*10)/10:null);
+  if(!full)return {full,d};
+  const allAway=d.every(v=>v>0);const iFar=b.indexOf(Math.max(...b)),iMax=d.indexOf(Math.max(...d));
+  return {full,d,allAway,farMost:iFar===iMax,iMax};}
+function updateDiff(t){
+  const st=tableStat(t);
+  st.d.forEach((v,i)=>{const c=$(`#d_${t}_${i}`);c.textContent=v===null?'':(v>0?'+':'')+v.toFixed(1)+' cm';c.classList.toggle('big',st.full&&i===st.iMax);});
+  const f=$('#fb'+(t==='t1'?1:2));
+  if(!st.full){f.className='fb';return;}
+  if(!st.allAway){f.className='fb show no';f.innerHTML='거리가 줄어들거나 그대로인 칸이 있어요. 줄자를 풍선 표면에 딱 붙여서 다시 재 보세요.';return;}
+  const who=t==='t1'?'①':'②',wa=t==='t1'?'과':'와';
+  f.className='fb show ok';f.innerHTML=`✓ ${who}에서 보아도 다른 딱지들이 <b>모두 멀어졌어요</b>.`+(st.farMost?` 그리고 처음에 ${who}${wa} 가장 멀리 있던 딱지가 가장 많이 멀어졌어요(노란 칸).`:` 가장 많이 늘어난 칸(노란 칸)이 처음에 가장 멀었던 딱지인지도 살펴보세요.`);
+}
+const EXQ=[
+  {o:['가까워진다','멀어진다','변하지 않는다'],a:1,ex:'고무풍선이 커질수록 붙임딱지 사이의 거리는 <b>멀어져요</b>.'},
+  {o:['더 적게 멀어졌다','더 많이 멀어졌다','똑같이 멀어졌다'],a:1,ex:'처음에 멀리 있던 딱지일수록 그 사이의 고무가 더 길어서, 풍선이 커질 때 <b>더 많이</b> 멀어져요.'},
+  {o:['딱지 ①이 풍선 팽창의 중심이다','어느 딱지에서 보아도 다른 딱지들이 멀어지므로, 특별한 중심은 없다','딱지 ②가 풍선 팽창의 중심이다'],a:1,ex:'①에서 봐도, ②에서 봐도 다른 딱지가 모두 멀어져요. 어느 딱지도 특별한 중심이 아니에요. <b>"모든 은하가 우리은하에서 멀어진다"고 해서 우리은하가 중심인 것은 아니에요.</b>'}];
+['eq0','eq1','eq2'].forEach((id,k)=>checkQ($('#'+id),$('#ef'+k),EXQ[k],S.exp.q,k));
+const MAPS=['우주 공간','은하','별','태양계'];
+['#selSurf','#selStk'].forEach(s=>MAPS.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;$(s).appendChild(o);}));
+$('#selSurf').value=S.exp.surf;$('#selStk').value=S.exp.stk;
+$('#selSurf').onchange=e=>{S.exp.surf=e.target.value;save();};$('#selStk').onchange=e=>{S.exp.stk=e.target.value;save();};
+function mapFb(){const f=$('#mapFb');if(!S.exp.surf||!S.exp.stk){f.className='fb show no';f.textContent='두 가지를 모두 골라 주세요.';return;}
+  S.exp.mapOk=S.exp.surf==='우주 공간'&&S.exp.stk==='은하';save();
+  f.className='fb show '+(S.exp.mapOk?'ok':'no');f.innerHTML=S.exp.mapOk?'✓ 맞아요! <b>풍선의 표면은 우주 공간</b>, <b>붙임딱지는 은하</b>에 해당해요.':'✗ 다시 생각해 봐요. 늘어나는 것은 무엇이고, 그 위에서 서로 멀어지는 것은 무엇일까요?';}
+$('#mapCheck').onclick=mapFb;
+function renderExp(){renderTable('t1');renderTable('t2');drawBalloon();}
+
+/* ===== STEP 4 팽창 시뮬레이션 ===== */
+let simA=1,simRef=0,playing=false,GEOM=null;
+function drawExp(){
+  const cv=$('#cvExp');const {ctx,W,H}=fit(cv,0.66);spaceBg(ctx,W,H);
+  const P=view(W,H,1.6);const ref=GALS[simRef];const px=Math.max(5,W/95);
+  const vis=(x,y,m)=>x>-m&&x<W+m&&y>-m&&y<H+m;
+  if(simA>1.001){GALS.forEach(g=>{if(g.id===simRef)return;const [x0,y0]=P(g,ref,1),[x1,y1]=P(g,ref,simA);if(!vis(x0,y0,10))return;
+    if($('#tGhost').checked){ctx.strokeStyle='rgba(255,255,255,0.3)';ctx.lineWidth=1;ctx.beginPath();ctx.arc(x0,y0,px*0.55,0,7);ctx.stroke();}
+    if($('#tArrow').checked)arrow(ctx,x0,y0,x1,y1,'rgba(255,200,120,0.85)',1.5);});}
+  GALS.forEach(g=>{const [x,y]=P(g,ref,simA);if(!vis(x,y,30))return;drawGalaxy(ctx,x,y,g,px);});
+  const [cx,cy]=P(ref,ref,simA);
+  if($('#tLine').checked){NAMED.forEach((n,i)=>{if(i===simRef)return;const [x,y]=P(GALS[i],ref,simA);
+    ctx.setLineDash([6,5]);ctx.strokeStyle='rgba(147,197,253,0.9)';ctx.lineWidth=1.6;ctx.beginPath();ctx.moveTo(cx,cy);ctx.lineTo(x,y);ctx.stroke();ctx.setLineDash([]);
+    const d=Math.round(Math.round(Math.hypot(GALS[i].x-ref.x,GALS[i].y-ref.y)*100)/10*simA*10)/10;
+    const mx=Math.max(30,Math.min(W-30,(cx+x)/2)),my=Math.max(14,Math.min(H-14,(cy+y)/2));tagLabel(ctx,mx,my,d.toFixed(1),{size:11,bg:'rgba(219,234,254,0.95)',color:'#1e3a8a'});});}
+  ctx.strokeStyle='#facc15';ctx.lineWidth=2.5;ctx.beginPath();ctx.arc(cx,cy,px*2.1,0,7);ctx.stroke();
+  NAMED.forEach((n,i)=>{const [x,y]=P(GALS[i],ref,simA);if(vis(x,y,0))tagLabel(ctx,x,y+px*2.7,n.n,{size:12,bg:i===simRef?'#facc15':'rgba(255,255,255,0.93)'});});
+  // 눈금자
+  const S0=W/2/1.6;const bar=0.1*10*S0/10;ctx.fillStyle='rgba(255,255,255,0.9)';ctx.fillRect(14,H-18,bar,3);ctx.font='600 11px "Malgun Gothic",sans-serif';ctx.fillText('1 눈금',14+bar+6,H-13);
+  GEOM={P,ref,W,H};
+  $('#aLab').textContent=`처음의 ${simA.toFixed(2)}배`;$('#aR').value=Math.round(simA*100);
+  $$('[data-ref]').forEach(b=>b.classList.toggle('on',+b.dataset.ref===simRef));
+  $('#expCap').innerHTML=`지금 기준 은하: <b>${simRef===0?'★ 우리은하':(GALS[simRef].name||'이름 없는 은하')}</b> · 은하를 눌러 기준을 바꿀 수 있어요.`;
+  renderExpTbl();
+}
+function renderExpTbl(){
+  const ref=GALS[simRef];
+  const r1=v=>Math.round(v*10)/10;
+  const rows=NAMED.map((n,i)=>i).filter(i=>i!==simRef).map(i=>{const d0=r1(Math.hypot(GALS[i].x-ref.x,GALS[i].y-ref.y)*10);const now=r1(d0*simA);return [NAMED[i].n,d0,now,r1(now-d0)];});
+  $('#expTbl').innerHTML='<tr><th>은하</th><th>처음 거리</th><th>지금 거리</th><th>늘어난 거리</th></tr>'+rows.map(r=>`<tr><td><b>${r[0]}</b></td><td>${r[1].toFixed(1)}</td><td>${r[2].toFixed(1)}</td><td class="diff">+${r[3].toFixed(1)}</td></tr>`).join('');
+}
+function setA(a){simA=Math.max(1,Math.min(2,a));
+  if(simA>=1.9){if(simRef===0)S.sim.m1=true;else S.sim.m2=true;if(!S.sim.refs.includes(simRef))S.sim.refs.push(simRef);save();renderSim();}
+  drawExp();}
+$('#aR').oninput=e=>{stopAnim();setA(+e.target.value/100);};
+$('#playBtn').onclick=()=>{
+  if(playing){stopAnim();return;}
+  if(simA>=1.999)simA=1;playing=true;$('#playBtn').textContent='⏸ 멈추기';let last=performance.now();
+  const stepF=t=>{const dt=(t-last)/1000;last=t;setA(simA+dt*0.33);if(simA<2&&playing)anim=requestAnimationFrame(stepF);else stopAnim();};
+  anim=requestAnimationFrame(stepF);
+};
+$('#backBtn').onclick=()=>{stopAnim();setA(1);};
+function setRef(i){stopAnim();simRef=i;simA=1;drawExp();}
+$$('[data-ref]').forEach(b=>b.onclick=()=>setRef(+b.dataset.ref));
+['#tGhost','#tArrow','#tLine'].forEach(s=>$(s).onchange=drawExp);
+$('#cvExp').addEventListener('pointerdown',e=>{if(!GEOM)return;const rc=e.currentTarget.getBoundingClientRect();const mx=e.clientX-rc.left,my=e.clientY-rc.top;
+  let best=-1,bd=24;GALS.forEach(g=>{const [x,y]=GEOM.P(g,GEOM.ref,simA);const d=Math.hypot(x-mx,y-my);if(d<bd){bd=d;best=g.id;}});
+  if(best>=0&&best!==simRef){setRef(best);toast('기준 은하를 바꿨어요. 다시 팽창시켜 보세요!');}});
+const SIMQ=[
+  {o:['더 적게 멀어진다','더 많이 멀어진다','모두 똑같이 멀어진다'],a:1,ex:'표의 \'늘어난 거리\'를 보면, 처음 거리가 멀수록 <b>더 많이</b> 멀어져요. 풍선 실험의 결과와 같아요.'},
+  {o:['우리은하가 중심이다','기준 은하가 바뀔 때마다 그 은하가 중심이다','어느 은하에서 보아도 다른 은하들이 멀어지므로, 특별한 중심이 없다'],a:2,ex:'어느 은하를 기준으로 해도 다른 은하들이 모두 멀어지는 똑같은 모습이 보여요. 우주 공간은 <b>특별한 중심 없이 모든 방향으로 팽창</b>해요.'}];
+const MISSIONS=[
+  ['m1','★ 우리은하를 기준으로 우주를 처음의 2배까지 팽창시키기'],
+  ['m2','기준 은하를 다른 은하로 바꿔서 2배까지 팽창시키기 (은하를 누르거나 위 버튼 사용)'],
+  ['q0','Q1 답하기'],['q1','Q2 답하기']];
+function renderSim(){
+  const done={m1:S.sim.m1,m2:S.sim.m2,q0:S.sim.q[0]===SIMQ[0].a,q1:S.sim.q[1]===SIMQ[1].a};
+  $('#missions').innerHTML=MISSIONS.map(([k,t])=>`<li class="${done[k]?'done':''}"><span class="ck">${done[k]?'✓':''}</span><span>${t}</span></li>`).join('');
+  const all=Object.values(done).every(Boolean);
+  $('#key4').classList.toggle('locked',!all);$('#key4').querySelector('h4').firstChild.textContent=all?'🔓 핵심 정리 ':'🔒 핵심 정리 ';
+  $('#key4Msg').textContent=all?'':'(미션을 모두 해결하면 열려요)';
+}
+checkQ($('#sq0'),$('#sf0'),SIMQ[0],S.sim.q,0,renderSim);
+checkQ($('#sq1'),$('#sf1'),SIMQ[1],S.sim.q,1,renderSim);
+
+/* ===== STEP 5 모형 따져 보기 ===== */
+const OX=[
+  ['붙임딱지 사이의 고무가 늘어나는 것은, 은하 사이의 우주 공간이 늘어나는 것에 해당한다.',true,'풍선 모형의 핵심이에요. 은하가 스스로 달려가는 것이 아니라, 은하 사이의 <b>공간이 늘어나서</b> 멀어져요.'],
+  ['풍선이 커져도 붙임딱지의 크기는 그대로인 것처럼, 우주가 팽창해도 은하 자체가 커지는 것은 아니다.',true,'붙임딱지 대신 펜으로 점을 그리면 점도 커져요. 그래서 이 실험에서는 크기가 변하지 않는 붙임딱지를 써요.'],
+  ['풍선에는 한가운데(풍선 속 중심)가 있으므로, 우주에도 팽창의 중심이 있다.',false,'풍선 모형에서 우주에 해당하는 것은 <b>풍선의 표면</b>뿐이에요. 표면 위에는 특별한 중심이 없어요. 풍선의 안쪽과 바깥쪽은 우주에 해당하지 않아요.'],
+  ['풍선 모형으로 실제 은하 사이의 거리를 정확하게 알 수 있다.',false,'모형은 <b>현상을 이해하기 쉽게</b> 나타낸 것이에요. 실제 거리나 크기를 그대로 나타내지는 않아요.']];
+function renderOx(){
+  $('#oxBox').innerHTML='<h3>⭕❌ 풍선 모형 O, X 퀴즈</h3>'+OX.map((q,i)=>`<div class="ox"><div>${i+1}. ${q[0]}</div><div class="bt"><button data-i="${i}" data-v="1" aria-label="O">O</button><button data-i="${i}" data-v="0" aria-label="X">X</button></div><div class="ex" id="oxe${i}"></div></div>`).join('');
+  $$('#oxBox .bt button').forEach(b=>b.onclick=()=>{S.ox[b.dataset.i]=b.dataset.v==='1';save();paintOx();});
+  paintOx();
+}
+function paintOx(){OX.forEach((q,i)=>{const v=S.ox[i];const bs=$$(`#oxBox button[data-i="${i}"]`);bs.forEach(b=>b.classList.remove('right','wrong'));const ex=$('#oxe'+i);
+  if(v===undefined){ex.className='ex';return;}const ok=v===q[1];bs[v?0:1].classList.add(ok?'right':'wrong');
+  ex.className='ex show';ex.innerHTML=`<span style="color:${ok?'var(--ok)':'var(--bad)'};font-weight:800">${ok?'✓ 정답':'✗ 오답'} (정답: ${q[1]?'O':'X'})</span> ${q[2]}`;});}
+['#selBread','#selRaisin'].forEach(s=>MAPS.forEach(m=>{const o=document.createElement('option');o.value=m;o.textContent=m;$(s).appendChild(o);}));
+$('#selBread').value=S.bread.b;$('#selRaisin').value=S.bread.r;
+$('#selBread').onchange=e=>{S.bread.b=e.target.value;save();};$('#selRaisin').onchange=e=>{S.bread.r=e.target.value;save();};
+$('#breadCheck').onclick=()=>{const f=$('#breadFb');if(!S.bread.b||!S.bread.r){f.className='fb show no';f.textContent='두 가지를 모두 골라 주세요.';return;}
+  S.bread.ok=S.bread.b==='우주 공간'&&S.bread.r==='은하';save();
+  f.className='fb show '+(S.bread.ok?'ok':'no');f.innerHTML=S.bread.ok?'✓ 맞아요! 부풀어 오르는 <b>빵은 우주 공간</b>, 서로 멀어지는 <b>건포도는 은하</b>예요. 건포도빵은 풍선과 달리 <b>입체</b>로 팽창하는 모습을 보여 줘요.':'✗ 다시 생각해 봐요. 풍선 모형에서 풍선 표면과 붙임딱지가 무엇이었는지 떠올려 보세요.';};
+$('#myModel').value=S.myModel;$('#myModel').oninput=e=>{S.myModel=e.target.value;save();};
+
+/* ===== STEP 6 용어 카드 ===== */
+const TERMS=[
+ ['외부 은하','우리은하 외에 우주에 존재하는 수많은 은하'],
+ ['허블','외부 은하 연구를 통하여 우주가 팽창한다는 사실을 밝혀낸 미국의 천문학자'],
+ ['안드로메다은하','허블이 우리은하 밖에 있다는 것을 처음으로 밝혀낸 외부 은하'],
+ ['허블의 발견','대부분의 외부 은하들이 서로 멀어지고 있다'],
+ ['우주 팽창','우주 공간이 늘어나면서 은하들이 서로 멀어지는 것'],
+ ['우주 팽창의 중심','특별한 중심 없이 모든 방향으로 팽창한다'],
+ ['우주의 시작','모든 물질과 에너지가 모인 한 점에서 시작하여 계속 팽창하고 있다'],
+ ['풍선 모형','풍선의 표면은 우주 공간, 붙임딱지는 은하에 해당한다'],
+ ['건포도빵 모형','부풀어 오르는 빵은 우주 공간, 건포도는 은하에 해당한다']];
+let F={i:0,mode:'term',only:false};
+function deck(){return TERMS.map((t,i)=>i).filter(i=>!F.only||!S.flash.known.includes(i));}
+function renderFlash(){
+  const d=deck();const fl=$('#flash');fl.classList.remove('flip');
+  const n=S.flash.known.length;$('#fCount').textContent=`외운 용어 ${n} / ${TERMS.length}`;$('#fBar').style.width=(n/TERMS.length*100)+'%';
+  $('#termTable').innerHTML='<tr><th>용어</th><th>뜻</th></tr>'+TERMS.map((t,i)=>`<tr><td><b>${S.flash.known.includes(i)?'✓ ':''}${t[0]}</b></td><td>${t[1]}</td></tr>`).join('');
+  if(!d.length){$('#fFront').textContent='🎉 모두 외웠어요!';$('#fBack').textContent='\'아직 모르는 카드만\'을 끄면 전체 카드를 다시 볼 수 있어요.';return;}
+  F.i=((F.i%d.length)+d.length)%d.length;const t=TERMS[d[F.i]];const known=S.flash.known.includes(d[F.i]);
+  $('#fFront').innerHTML=(F.mode==='term'?esc(t[0]):`<span style="font-size:1.05rem;font-weight:600">${esc(t[1])}</span>`)+(known?'<div class="mini" style="color:var(--ok);margin-top:8px">✓ 외운 카드</div>':'');
+  $('#fBack').innerHTML=F.mode==='term'?esc(t[1]):`<span style="font-size:1.6rem;font-weight:800">${esc(t[0])}</span>`;
+}
+$('#flash').onclick=()=>$('#flash').classList.toggle('flip');
+$('#fKnow').onclick=()=>{const d=deck();if(!d.length)return;const id=d[F.i];if(!S.flash.known.includes(id))S.flash.known.push(id);save();if(!F.only)F.i++;renderFlash();};
+$('#fAgain').onclick=()=>{const d=deck();if(!d.length)return;const id=d[F.i];S.flash.known=S.flash.known.filter(x=>x!==id);save();F.i++;renderFlash();};
+$('#fPrev').onclick=()=>{F.i--;renderFlash();};
+$('#fmTerm').onclick=()=>{F.mode='term';$('#fmTerm').classList.add('on');$('#fmDef').classList.remove('on');renderFlash();};
+$('#fmDef').onclick=()=>{F.mode='def';$('#fmDef').classList.add('on');$('#fmTerm').classList.remove('on');renderFlash();};
+$('#fOnlyUnknown').onchange=e=>{F.only=e.target.checked;F.i=0;renderFlash();};
+
+/* ===== STEP 7 퀴즈 ===== */
+const QUIZ=[
+ ['우주에는 우리은하 외에도 수많은 다른 은하들이 존재하는데, 이를 무엇이라고 할까요?',['성단','성운','외부 은하','은하수'],2,'우리은하 외에 우주에 존재하는 수많은 은하를 <b>외부 은하</b>라고 해요.'],
+ ['허블이 외부 은하를 관측하여 알아낸 사실로 옳은 것은?',['대부분의 외부 은하들이 서로 멀어지고 있다','대부분의 외부 은하들이 우리은하로 다가오고 있다','외부 은하들은 모두 제자리에 멈춰 있다','외부 은하는 우리은하 안에 있다'],0,'허블은 <b>대부분의 외부 은하들이 서로 멀어지고 있다</b>는 것을 알아내었어요.'],
+ ['풍선 실험에서 풍선의 표면은 무엇에 해당할까요?',['은하','별','우주 공간','태양계'],2,'늘어나는 <b>풍선의 표면은 우주 공간</b>에 해당해요.'],
+ ['풍선 실험에서 붙임딱지는 무엇에 해당할까요?',['은하','우주 공간','성간 물질','행성'],0,'서로 멀어지는 <b>붙임딱지는 은하</b>에 해당해요.'],
+ ['고무풍선이 커지면서 붙임딱지 사이의 거리는 어떻게 변할까요?',['가까워진다','멀어진다','변하지 않는다','처음에는 멀어지다가 다시 가까워진다'],1,'풍선의 표면이 늘어나면서 붙임딱지 사이의 거리는 <b>멀어져요</b>.'],
+ ['우주 팽창에 관한 설명으로 옳은 것은?',['우리은하를 중심으로 팽창한다','은하들 사이의 거리가 멀어진다','우주가 팽창하면서 은하가 한 점에 모인다','안드로메다은하를 중심으로 팽창한다'],1,'우주가 팽창하면 <b>은하들 사이의 거리가 멀어져요</b>. 특별한 중심은 없어요.'],
+ ['대부분의 외부 은하가 우리은하에서 멀어지는 것처럼 보이는 까닭으로 옳은 것은?',['우리은하가 우주의 중심이기 때문','우리은하가 다른 은하들을 밀어내기 때문','우주가 특별한 중심 없이 모든 방향으로 팽창하기 때문','우리은하만 가만히 있기 때문'],2,'어느 은하에서 보아도 다른 은하들이 멀어져 보여요. 우주가 <b>특별한 중심 없이 모든 방향으로 팽창</b>하기 때문이에요.'],
+ ['과학자들이 설명하는 우주의 모습으로 옳은 것은?',['우주는 처음부터 지금과 같은 크기였다','우주는 모든 물질과 에너지가 모인 한 점에서 시작하여 계속 팽창하고 있다','우주는 점점 작아지고 있다','우주는 우리은하 하나로 이루어져 있다'],1,'과학자들은 우주가 <b>모든 물질과 에너지가 모인 한 점에서 시작하여 계속 팽창</b>하고 있다고 설명해요.'],
+ ['풍선 실험에서 처음에 딱지 ①과 멀리 떨어져 있던 딱지는, 가까이 있던 딱지보다 어떻게 될까요?',['더 많이 멀어진다','더 적게 멀어진다','똑같이 멀어진다','오히려 가까워진다'],0,'처음에 멀리 있던 딱지일수록 그 사이의 고무가 길어서 <b>더 많이 멀어져요</b>.'],
+ ['건포도빵을 구울 때 빵이 부풀어 오르면서 건포도 사이의 간격이 멀어진다. 이 모형에서 건포도에 해당하는 것은?',['우주 공간','은하','별의 빛','우주의 중심'],1,'부풀어 오르는 빵은 우주 공간, <b>건포도는 은하</b>에 해당해요.']];
+function quizScore(){return QUIZ.reduce((s,q,i)=>s+(S.quiz.first[i]===q[2]?1:0),0);}
+function renderQuiz(){
+  $('#quizBox').innerHTML=QUIZ.map((q,i)=>`<div class="qitem"><div class="q">${i+1}. ${q[0]}</div><div class="opts" id="qo${i}"></div><div class="fb" id="qf${i}"></div></div>`).join('');
+  QUIZ.forEach((q,i)=>{const v=S.quiz.first[i];const ans=v!==undefined&&v!==null;
+    makeOpts($('#qo'+i),q[1],()=>S.quiz.first[i],k=>{if(S.quiz.first[i]!==undefined&&S.quiz.first[i]!==null)return;S.quiz.first[i]=k;save();renderQuiz();},{correct:ans?q[2]:undefined});
+    if(ans){const f=$('#qf'+i);f.className='fb show '+(v===q[2]?'ok':'no');f.innerHTML=(v===q[2]?'✓ 정답! ':'✗ 오답. ')+q[3];}});
+  $('#quizScore').textContent=quizScore();
+}
+$('#quizRetry').onclick=()=>{S.quiz.first={};save();renderQuiz();window.scrollTo({top:0,behavior:'smooth'});};
+
+/* ===== STEP 8 성찰·제출 ===== */
+['r1','r2','r3','r3a','r3s'].forEach(id=>{$('#'+id).value=S.ref[id]||'';$('#'+id).oninput=e=>{S.ref[id]=e.target.value;save();if(id==='r3a')checkCopy();$('#resultText').textContent=buildText();};});
+/* 붙여넣은 글이 얼마나 그대로 남아 있는지 검사: 6글자 조각이 절반 이상 남아 있으면 '그대로 붙여넣음' */
+function shingles(s){const t=String(s).replace(/[\s.,!?·'"“”‘’()\[\]~\-:;]/g,'');const a=new Set();for(let i=0;i+6<=t.length;i++)a.add(t.slice(i,i+6));return a;}
+function copyRatio(){const cur=shingles(S.ref.r3a||'');let tot=0,kept=0;(S.ref.r3paste||[]).forEach(p=>{const ps=shingles(p);ps.forEach(x=>{tot++;if(cur.has(x))kept++;});});return tot?kept/tot:0;}
+function isCopied(){return copyRatio()>=0.5;}
+function checkCopy(){
+  const ta=$('#r3a'),f=$('#r3aFb');const has=(S.ref.r3paste||[]).length>0&&(S.ref.r3a||'').trim();
+  if(!has){ta.classList.remove('pasted');f.className='fb';return;}
+  if(isCopied()){ta.classList.add('pasted');f.className='fb show no';f.innerHTML=`⚠️ <b>붙여넣은 글이 그대로 남아 있어요</b> (약 ${Math.round(copyRatio()*100)}%). 내가 이해한 말로 바꿔서 다시 설명해 보세요. 어려운 낱말은 쉬운 말로, 긴 문장은 짧게 나눠 써 보세요.`;}
+  else{ta.classList.remove('pasted');f.className='fb show ok';f.innerHTML='✓ 내 말로 바꿔 썼어요! 친구에게 설명하듯이 썼는지 한 번 더 읽어 보세요.';}
+}
+function onPasteText(txt){txt=String(txt||'').trim();if(txt.length<12)return;S.ref.r3paste=S.ref.r3paste||[];S.ref.r3paste.push(txt);save();setTimeout(()=>{S.ref.r3a=$('#r3a').value;save();checkCopy();$('#resultText').textContent=buildText();},0);}
+$('#r3a').addEventListener('paste',e=>{const d=e.clipboardData||window.clipboardData;onPasteText(d?d.getData('text'):'');});
+$('#r3a').addEventListener('drop',e=>{const d=e.dataTransfer;onPasteText(d?d.getData('text'):'');});
+checkCopy();
+function tblText(t){const D=S.exp[t];return PAIRS[t].map((p,i)=>{const b=num(D.b[i]),a=num(D.a[i]);return `${p} ${b===null?'-':b}→${a===null?'-':a}cm`;}).join(', ');}
+function buildText(){
+  const L=[];const p=S.pred;
+  const oxN=OX.filter((q,i)=>S.ox[i]===q[1]).length;
+  L.push('[8. 별과 우주 · 6차시 우주 팽창]');
+  L.push(`학번: ${S.num||'-'}  이름: ${S.name||'-'}`);
+  L.push('');
+  L.push('■ 예측과 결과');
+  L.push(`· 흐릿한 덩어리의 정체: ${p.blob===null?'(예측 안 함)':BLOB_OPTS[p.blob]} ${p.blob===1?'✓':''}`);
+  if(p.blobWhy.trim())L.push(`  └ 까닭: ${p.blobWhy.trim()}`);
+  L.push(`· 외부 은하의 움직임: ${p.move===null?'(예측 안 함)':MOVE_OPTS[p.move]} ${p.move===1?'✓':''}`);
+  L.push(`· 우리은하가 우주의 중심일까: ${p.center===null?'(예측 안 함)':CENTER_OPTS[p.center]} ${p.center===1?'✓':''}`);
+  if(p.centerWhy.trim())L.push(`  └ 까닭: ${p.centerWhy.trim()}`);
+  L.push('');
+  L.push('■ 풍선 실험');
+  L.push(`· 측정 ①: ${tblText('t1')}`);
+  L.push(`· 측정 ②: ${tblText('t2')}`);
+  L.push(`· 정리 질문: ${[0,1,2].filter(k=>S.exp.q[k]===EXQ[k].a).length} / 3 정답, 풍선 표면·붙임딱지 비유 ${S.exp.mapOk?'✓':'미완료'}`);
+  L.push('');
+  L.push('■ 활동 기록');
+  L.push(`· 팽창 시뮬레이션 미션: ${[S.sim.m1,S.sim.m2,S.sim.q[0]===SIMQ[0].a,S.sim.q[1]===SIMQ[1].a].filter(Boolean).length} / 4`);
+  L.push(`· 풍선 모형 O, X: ${oxN} / ${OX.length}`);
+  L.push(`· 건포도빵 모형: ${S.bread.ok?'✓':'미완료'}`);
+  if(S.myModel.trim())L.push(`· 내가 찾은 우주 팽창 모형: ${S.myModel.trim()}`);
+  L.push(`· 외운 용어: ${S.flash.known.length} / ${TERMS.length}`);
+  L.push(`· 확인 퀴즈: ${quizScore()} / 10`);
+  L.push('');
+  L.push('■ 성찰');
+  L.push(`1. 먼 미래의 밤하늘: ${S.ref.r1.trim()||'-'}`);
+  L.push(`2. 우리은하는 중심일까? 생각의 변화: ${S.ref.r2.trim()||'-'}`);
+  L.push(`3. 새롭게 궁금해진 것: ${S.ref.r3.trim()||'-'}`);
+  L.push(`   └ 내가 찾은 답: ${(S.ref.r3a||'').trim()||'-'}${(S.ref.r3a||'').trim()&&isCopied()?' ⚠(붙여넣은 글 그대로)':''}`);
+  L.push(`   └ 찾은 곳: ${(S.ref.r3s||'').trim()||'-'}`);
+  return L.join('\n');
+}
+function renderResult(){
+  const p=S.pred;
+  const rows=[
+    ['흐릿한 덩어리의 정체',p.blob===null?'-':BLOB_OPTS[p.blob],'우리은하 밖의 또 다른 은하 (외부 은하)',p.blob===1],
+    ['외부 은하의 움직임',p.move===null?'-':MOVE_OPTS[p.move],'대부분의 외부 은하들이 서로 멀어지고 있다',p.move===1],
+    ['우리은하가 우주의 중심일까?',p.center===null?'-':CENTER_OPTS[p.center],'아니다. 우주는 특별한 중심 없이 모든 방향으로 팽창한다',p.center===1]];
+  $('#predTable').innerHTML='<tr><th>질문</th><th>처음 내 예측</th><th>오늘 알게 된 것</th></tr>'+rows.map(r=>`<tr><td><b>${r[0]}</b></td><td>${esc(r[1])} ${r[3]?'✓':''}</td><td>${r[2]}</td></tr>`).join('');
+  $('#resultText').textContent=buildText();
+}
+$('#copyBtn').onclick=async()=>{const t=buildText();
+  try{await navigator.clipboard.writeText(t);toast('📋 복사했어요! 패들렛에 붙여넣기 하세요');}
+  catch(e){const ta=document.createElement('textarea');ta.value=t;document.body.appendChild(ta);ta.select();try{document.execCommand('copy');toast('📋 복사했어요! 패들렛에 붙여넣기 하세요');}catch(e2){toast('복사가 안 되면 아래 글을 직접 드래그해서 복사하세요');}ta.remove();}};
+$('#pngBtn').onclick=()=>{
+  const text=buildText().split('\n');const W=900,P=44,font='"Malgun Gothic","Apple SD Gothic Neo",sans-serif';
+  const c=document.createElement('canvas');const x=c.getContext('2d');x.font=`500 20px ${font}`;
+  const lines=[];text.slice(2).forEach(l=>{if(!l){lines.push('');return;}let cur='';for(const ch of l){if(x.measureText(cur+ch).width>W-P*2){lines.push(cur);cur='   '+ch;}else cur+=ch;}lines.push(cur);});
+  const H=170+lines.length*32+P;c.width=W;c.height=H;
+  x.fillStyle='#ffffff';x.fillRect(0,0,W,H);x.fillStyle='#eceeff';x.fillRect(0,0,W,130);
+  x.fillStyle='#3f3fb3';x.font=`800 30px ${font}`;x.fillText('🎈 우주 팽창 탐구 결과 카드',P,58);
+  x.fillStyle='#1d2340';x.font=`700 22px ${font}`;x.fillText(`${S.num||''} ${S.name||''}  ·  8. 별과 우주 6차시`,P,100);
+  let y=170;lines.forEach(l=>{x.font=(l.startsWith('■')?`800 21px `:`500 20px `)+font;x.fillStyle=l.startsWith('■')?'#3f3fb3':'#1d2340';x.fillText(l,P,y);y+=32;});
+  const a=document.createElement('a');a.download=`우주팽창_${S.num||'학번'}_${S.name||'이름'}.png`;a.href=c.toDataURL('image/png');document.body.appendChild(a);a.click();a.remove();toast('🖼️ 이미지를 저장했어요! 패들렛에 올려 주세요');};
+
+/* ===== 초기화 ===== */
+updateWho();applyPresent();go(S.step||0);
+/* ===== 완료 ===== */
+function finish(){
+  renderResult();
+  const empty=['r1','r2','r3','r3a','r3s'].filter(k=>!(S.ref[k]||'').trim()).length;
+  $('#doneMsg').innerHTML=(S.name?esc(S.name)+' 학생, ':'')+'오늘 탐구를 모두 마쳤어요. 수고했어요!'+(empty?`<br><span style="color:var(--bad)">성찰 질문 ${empty}개가 아직 비어 있어요. 채운 뒤 제출하면 더 좋아요.</span>`:'');
+  $('#doneModal').classList.add('show');
+}
+$('#doneCopy').onclick=()=>$('#copyBtn').click();
+$('#donePng').onclick=()=>$('#pngBtn').click();
+$('#doneClose').onclick=()=>$('#doneModal').classList.remove('show');
+$('#doneModal').onclick=e=>{if(e.target.id==='doneModal')$('#doneModal').classList.remove('show');};
+</script>
+</body>
+</html>
